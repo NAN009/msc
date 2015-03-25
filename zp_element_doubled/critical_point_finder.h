@@ -1,6 +1,7 @@
 #ifndef critical_point_finder_h
 #define critical_point_finder_h
-
+#include <map>
+#include <utility>
 #include "mscomplex.h"
 namespace msc2d
 {
@@ -9,8 +10,11 @@ namespace msc2d
 	public:
 		CPFinder(MSComplex2D& _msc);
 		~CPFinder();
+
+		
 		void findCriticalPoints();
-		bool JacbiCor(double * pMatrix, int nDim, double *pdblVects, double *pdbEigenValues, double dbEps, int nJt);
+		void computeValue();
+		bool JacbiCor(double * pMatrix,  double *pdblVects, double *pdbEigenValues, double dbEps, int nJt);
 	private:
 		CriticalPointType getPointType(double eig_value1,double eig_value2)const;
 		MSComplex2D &msc;
@@ -26,7 +30,7 @@ namespace msc2d
 		void initialize();
 		void read_data();
 		void reconstruct();
-
+		
 		bool with_header;
 	private:
 		char* original_data_path;

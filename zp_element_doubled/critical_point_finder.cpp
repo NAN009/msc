@@ -15,7 +15,7 @@ namespace msc2d
 	using namespace std;
 	vtkReader vr;
 	point_evaluator_7direction* p7;
-
+	
 
 	void reconstructor::set_dimension(int L, int W)
 	{
@@ -44,10 +44,11 @@ namespace msc2d
 
 	void CPFinder::findCriticalPoints()
 	{
+		
 		box_spline* bs;
 		bs = new box_spline();
 		//FILE * fp;
-
+		fstream cp1("d:\\201test1.txt");
 		vr.loadFile("D:\\data\\201sin.vtk");//201数据：由于201数据步长为0.1，求偏导数的默认步长为1，故求出结果为实际结果的十分之一；
 		double x_ordinates[10000], y_ordinates[10000];//第一个参数为列，按列读取数据
 		/*ofstream value("D:\\data\\201sin_value.txt");
@@ -62,8 +63,7 @@ namespace msc2d
 		int position[2];
 		double sum, dif__x, dif__y, dif__yy, dif__xx, dif__xy, Value;
 		double distance[2];
-		double diff_x, diff_xx;
-		double diff_y, diff_yy;
+		double diff_x, diff_y;
 		double f_with_diff, f_with_diff2;
 		double value1, value3, value2, value4, value5, value0;
 		for (int i = 0; i < vr.dim[0]; i++)
@@ -71,7 +71,7 @@ namespace msc2d
 		for (int i = 0; i < vr.dim[1]; i++)
 			y_ordinates[i] = i;
 		
-
+		cout << " find critical point begin!" << endl;
 		CriticalPointArray &cp_vec = msc.cp_vec;//一维存放,cp_vec设为public类型可以访问，private不能访问,当定义为friend类时，可以访问私有类型
 		cp_vec.clear();
 		//cp_vec.resize(vr.dim[0] * vr.dim[1]);
@@ -223,39 +223,52 @@ namespace msc2d
 					dif__yy = 0;
 				if (dif__xy<2e-006&&dif__xy>-2e-006)
 					dif__xy = 0;
-				
-				double eig_value[2], eig_vector[2][2],dif[2][2],eps=0.001;
-				int Dim = 2, nJt = 10;
-				CriticalPoint cp;
-				cp.xy_local.first = i;
-				cp.xy_local.second= j;
-				cp.meshIndex = i*vr.dim[0] + j;
-				cp.dif = make_pair(dif__x, dif__y);
 
+			        CriticalPoint cp;
+					cp.xy_local.first = i;
+					cp.xy_local.second = j;
+					cp.meshIndex = i*vr.dim[0] + j;
+					cp.dif = make_pair(dif__x, dif__y);
+				
 				if (dif__x == 0 && dif__y == 0)
 				{
+					double eig_value[2], eig_vector[2][2], dif[2][2], eps = 0.000001;
+					const int Dim = 2, nJt = 1000000;
+					
 					dif[0][0] = dif__xx; dif[0][1] = dif__xy; dif[1][0] = dif__xy; dif[1][1] = dif__yy;
-					if (JacbiCor(*dif, Dim, *eig_vector, eig_value, eps, nJt))
+					//cout << i << " " << j << endl;
+					if (JacbiCor(*dif, *eig_vector, eig_value, eps, nJt))
 					{
-						if (eig_value[1]<0&&eig_value[0]<0)
+						if (eig_value[1]<0 && eig_value[0]<0)
 						{
-							cp.type == MAXIMAL;
+							cp.type = MAXIMAL;
+							cp.eig_vector1 = make_pair(0,0);
+							cp.eig_vector2 = make_pair(0, 0);
 						}
 						else if (eig_value[0]>0 && eig_value[1]>0)
-							cp.type == MINIMAL;
+						{
+							cp.type = MINIMAL;
+							cp.eig_vector1 = make_pair(0, 0);
+							cp.eig_vector2 = make_pair(0, 0);
+						}
 						else
 						{
-							cp.type == SADDLE;
+							cp.type = SADDLE;
 							//特征向量
-							cp.eig_vector1 = make_pair(eig_vector[0][0],eig_vector[1][0]);
-							cp.eig_vector2 = make_pair(eig_vector[0][1],eig_vector[1][1]);
+							cp.eig_vector1 = make_pair(eig_vector[0][0], eig_vector[1][0]);
+							cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
 						}
-					}												
+					}	
 				}
-				else
-					cp.type == REGULAR;
+				else 
+					cp.type = REGULAR;
+
 				cp_vec.push_back(cp);
+				//cout << cp.xy_local.first << " " << cp.xy_local.second << " " << cp.type << endl;
 				
+				
+				
+				//cout << cp_vec[i].xy_local.first << " " << cp_vec[i].xy_local.second << " " << cp_vec[i].type << endl;
 				/*value << Value << " ";
 				dif_x << dif__x << " ";
 				dif_y << dif__y << " ";
@@ -271,16 +284,72 @@ namespace msc2d
 			dif_yy << endl;*/
 		}
 		delete bs;
+		cout << " find critical point end!" << endl;
 	}
 	//CriticalPointType CPFinder::getPointType(double eig_value1, double eig_value2) const
 	//{
 	//	//if (eig_value1 < 0 && eig_value2 < 0)
 	//	return  MAXIMAL;
 
+	//void CPFinder::findCriticalPoints()
+	//{
+	//	for (int i = 0; i < vr.dim[0]; i++)
+	//	{
+	//		for (int j = 0; j < vr.dim[1]; j++)
+	//		{
+
+	//			double eig_value[2], eig_vector[2][2], dif[2][2], eps = 0.001;
+	//			int Dim = 2, nJt = 10;
+	//			CriticalPoint cp;
+	//			cp.xy_local.first = i;
+	//			cp.xy_local.second = j;
+	//			cp.meshIndex = i*vr.dim[0] + j;
+	//			cp.dif = make_pair(dif__x, dif__y);
+
+	//			if (dif__x == 0 && dif__y == 0)
+	//			{
+	//				dif[0][0] = dif__xx; dif[0][1] = dif__xy; dif[1][0] = dif__xy; dif[1][1] = dif__yy;
+	//				if (JacbiCor(*dif, Dim, *eig_vector, eig_value, eps, nJt))
+	//				{
+	//					if (eig_value[1]<0 && eig_value[0]<0)
+	//					{
+	//						cp.type = MAXIMAL;
+	//					}
+	//					else if (eig_value[0]>0 && eig_value[1]>0)
+	//						cp.type = MINIMAL;
+	//					else
+	//					{
+	//						cp.type = SADDLE;
+	//						//特征向量
+	//						cp.eig_vector1 = make_pair(eig_vector[0][0], eig_vector[1][0]);
+	//						cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
+	//					}
+	//				}
+	//			}
+	//			else
+	//				cp.type = REGULAR;
+	//			cp_vec.push_back(cp);
+	//		}
+	//	}
+	//}
 	//}
 	//求特征向量特征值
-	bool CPFinder::JacbiCor(double * pMatrix, int nDim, double *pdblVects, double *pdbEigenValues, double dbEps, int nJt)
+	bool CPFinder::JacbiCor(double * pMatrix, double *pdblVects, double *pdbEigenValues, double dbEps, int nJt)
 	{
+		if (pMatrix[0] == pMatrix[3])
+		{
+			double eig1[2] = { 1, 0 }, eig2[2] = {0, 1};
+
+			if (pMatrix[1]==0&&pMatrix[2]==0)
+			{
+				pdbEigenValues[0] = pMatrix[0];
+				pdbEigenValues[1] = pMatrix[3];
+				pdblVects[0] = *eig1;
+				pdblVects[1] = *eig2;
+				return true;
+			}
+		}
+		const int nDim = 2;
 		for (int i = 0; i < nDim; i++)
 		{
 			pdblVects[i*nDim + i] = 1.0f;
@@ -415,5 +484,6 @@ namespace msc2d
 
 		return 1;
 	}
+
 
 }

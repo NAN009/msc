@@ -57,10 +57,10 @@ namespace msc2d
 					curr_vid = next_x*vr1_size + next_y;
 					while (msc.cp_vec[curr_vid].type != MAXIMAL)
 					{
-						if (msc.cp_vec[curr_vid].type == SADDLE)
+						/*if (msc.cp_vec[curr_vid].type == SADDLE)
 						{
-							continue;
-						}
+						continue;
+						}*/
 						pair<int, int> tmp_xy;
 						tmp_xy = getGradDirection(msc.cp_vec[curr_vid].xy_local);
 						mesh_path.push_back(tmp_xy);                  
@@ -81,6 +81,7 @@ namespace msc2d
 	pair<int,int> ILTracer::getGradDirection(pair<int,int> xy)
 	{
 		//四阶龙格库塔法 h=2,待检验，floor向下取整
+
 		int x = xy.first, y = xy.second;
 		int k1x = floor(msc.cp_vec[x*vr1_size+y].dif.first);
 		int k2x=floor(msc.cp_vec[(x + k1x)*vr1_size + y + 1].dif.first);

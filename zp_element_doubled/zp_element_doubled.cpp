@@ -198,15 +198,12 @@ int main()
 	//			sum1=0;
 	//		if(sum2<0.006&&sum2>-0.006)
 	//			sum2=0;
-
 	//		if(sum3<2e-006&&sum3>-2e-006)
 	//			sum3=0;
 	//		if(sum4<2e-006&&sum4>-2e-006)
 	//			sum4=0;
 	//		if(sum5<2e-006&&sum5>-2e-006)
 	//			sum5=0;
-
-
 	//		//double eigvalue1,eigvalue2;
 	//		//if(sum1==0&&sum2==0)
 	//		//{
@@ -233,7 +230,6 @@ int main()
 	//		//os2<<sum2<<" ";
 	//		//os3<<sum5<<" ";
 	//		
-
 	//	}
 	//	value << endl;
 	//	dif_x << endl;
@@ -242,9 +238,8 @@ int main()
 	//	dif_xy << endl;
 	//	dif_yy << endl;
 	//}
-
 	////x,y取值范围都为【-3,3】
-	///*box_spline* bs;
+	//*box_spline* bs;
 	//bs = new box_spline();
 	//double a[2];
 	//a[0] = 2;
