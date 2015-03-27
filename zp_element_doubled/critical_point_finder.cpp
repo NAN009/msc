@@ -28,8 +28,8 @@ namespace msc2d
 		this->stepx = stepx;
 		this->stepy = stepy;
 
-		this->nx = (int)floor(((this->L) - 1) / this->stepx) + 1;
-		this->ny = (int)floor(((this->W) - 1) / this->stepy) + 1;
+		this->nx = (int)ceil(((this->L) - 1) / this->stepx) + 1;
+		this->ny = (int)ceil(((this->W) - 1) / this->stepy) + 1;
 	}
 
 	int cut(int i, int N)
@@ -71,7 +71,7 @@ namespace msc2d
 		for (int i = 0; i < vr.dim[1]; i++)
 			y_ordinates[i] = i;
 		
-		cout << " find critical point begin!" << endl;
+		cout << "Find critical point begin!" << endl;
 		CriticalPointArray &cp_vec = msc.cp_vec;//一维存放,cp_vec设为public类型可以访问，private不能访问,当定义为friend类时，可以访问私有类型
 		cp_vec.clear();
 		//cp_vec.resize(vr.dim[0] * vr.dim[1]);
@@ -90,8 +90,8 @@ namespace msc2d
 					{
 						for (int q = 0; q < 7; q++)
 						{
-							position[0] = cut((int)floor(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
-							position[1] = cut((int)floor(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
+							position[0] = cut((int)ceil(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
+							position[1] = cut((int)ceil(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
 							distance[0] = position[0] - x_ordinates[i];
 							distance[1] = position[1] - y_ordinates[j];
 							value0 = bs->compute_value(distance);
@@ -114,8 +114,8 @@ namespace msc2d
 				{
 					for (int q = 0; q < 7; q++)
 					{
-						position[0] = cut((int)floor(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
-						position[1] = cut((int)floor(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
+						position[0] = cut((int)ceil(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
+						position[1] = cut((int)ceil(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
 						distance[0] = position[0] - x_ordinates[i];
 						distance[1] = position[1] - y_ordinates[j];
 
@@ -140,8 +140,8 @@ namespace msc2d
 				{
 					for (int q = 0; q < 5; q++)
 					{
-						position[0] = cut((int)floor(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
-						position[1] = cut((int)floor(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
+						position[0] = cut((int)ceil(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
+						position[1] = cut((int)ceil(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
 						distance[0] = position[0] - x_ordinates[i];
 						distance[1] = position[1] - y_ordinates[j];
 						value3 = bs->compute_gradient_xx(distance);
@@ -160,8 +160,8 @@ namespace msc2d
 				{
 					for (int q = 0; q < 7; q++)
 					{
-						position[0] = cut((int)floor(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
-						position[1] = cut((int)floor(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
+						position[0] = cut((int)ceil(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
+						position[1] = cut((int)ceil(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
 						distance[0] = position[0] - x_ordinates[i];
 						distance[1] = position[1] - y_ordinates[j];
 						//value3 = bs->compute_gradient_xx(distance);	
@@ -180,8 +180,8 @@ namespace msc2d
 				{
 					for (int q = 0; q < 6; q++)
 					{
-						position[0] = cut((int)floor(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
-						position[1] = cut((int)floor(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
+						position[0] = cut((int)ceil(x_ordinates[i] + 0.5) + p - 3, vr.dim[0]);
+						position[1] = cut((int)ceil(y_ordinates[j] + 0.5) + q - 3, vr.dim[1]);
 						distance[0] = position[0] - x_ordinates[i];
 						distance[1] = position[1] - y_ordinates[j];
 						value5 = bs->compute_gradient_xy(distance);
@@ -259,6 +259,7 @@ namespace msc2d
 							cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
 						}
 					}	
+				
 				}
 				else 
 					cp.type = REGULAR;
