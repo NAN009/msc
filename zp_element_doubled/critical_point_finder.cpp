@@ -10,8 +10,11 @@
 #include "critical_point_finder.h"
 #include "mscomplex.h"
 #include <map>
+
 namespace msc2d
 {
+	const double LARGE_ZERO_EPSILON = 0.0035;//401数据
+	const double SMALL_ZERO_EPSILON = 2e-006;
 	using namespace std;
 	vtkReader vr;
 	point_evaluator_7direction* p7;
@@ -48,17 +51,17 @@ namespace msc2d
 		box_spline* bs;
 		bs = new box_spline();
 		//FILE * fp;
-		fstream cp1("d:\\201test1.txt");
-		vr.loadFile("D:\\data\\201sin.vtk");//201数据：由于201数据步长为0.1，求偏导数的默认步长为1，故求出结果为实际结果的十分之一；
+		
+		vr.loadFile("D:\\401data\\sin401.vtk");//201数据：由于201数据步长为0.1，求偏导数的默认步长为1，故求出结果为实际结果的十分之一；
 		double x_ordinates[10000], y_ordinates[10000];//第一个参数为列，按列读取数据
-		/*ofstream value("D:\\data\\201sin_value.txt");
-		ofstream dif_x("D:\\data\\201sin_dif_x.txt");
-		ofstream dif_y("D:\\data\\201sin_dif_y.txt");
-		ofstream dif_xx("D:\\data\\201sin_dif_xx.txt");
-		ofstream dif_xy("D:\\data\\201sin_dif_xy.txt");
-		ofstream dif_yy("D:\\data\\201sin_dif_yy.txt");
-		cout<<vr.getData(0,0)<<" "<<vr.getData(0,1)<<" "<<vr.getData(0,2)<<endl;
-		cout<<vr.getData(1,0)<<" "<<vr.getData(1,1)<<" "<<vr.getData(1,2)<<endl;*/
+		ofstream value("D:\\401data\\sin401_cp.txt");
+		//ofstream dif_x("D:\\data\\201sin_dif_x.txt");
+		//ofstream dif_y("D:\\data\\201sin_dif_y.txt");
+		//ofstream dif_xx("D:\\data\\201sin_dif_xx.txt");
+		//ofstream dif_xy("D:\\data\\201sin_dif_xy.txt");
+		//ofstream dif_yy("D:\\data\\201sin_dif_yy.txt");
+		//cout<<vr.getData(0,0)<<" "<<vr.getData(0,1)<<" "<<vr.getData(0,2)<<endl;
+		//cout<<vr.getData(1,0)<<" "<<vr.getData(1,1)<<" "<<vr.getData(1,2)<<endl;
 		int m = 0;
 		int position[2];
 		double sum, dif__x, dif__y, dif__yy, dif__xx, dif__xy, Value;
@@ -71,11 +74,12 @@ namespace msc2d
 		for (int i = 0; i < vr.dim[1]; i++)
 			y_ordinates[i] = i;
 		
-		cout << " find critical point begin!" << endl;
+		cout << "Find critical point begin!" << endl;
 		CriticalPointArray &cp_vec = msc.cp_vec;//一维存放,cp_vec设为public类型可以访问，private不能访问,当定义为friend类时，可以访问私有类型
 		cp_vec.clear();
 		//cp_vec.resize(vr.dim[0] * vr.dim[1]);
-		size_t k = 0;
+		size_t k = 0,count_cp=0;
+
 		for (int i = 0; i < vr.dim[0]; i++)
 		{
 			for (int j = 0; j < vr.dim[1]; j++)
@@ -83,7 +87,10 @@ namespace msc2d
 				sum = 0; dif__x = 0; dif__y = 0; dif__yy = 0, dif__xy = 0, Value = 0, dif__xx = 0;
 				//value
 				if (i == 0 || i == 1 || j == 0 || j == 1 || i == vr.dim[0] - 1 || i == vr.dim[0] - 2 || j == vr.dim[1] - 1 || j == vr.dim[1] - 2)
+				{		
 					Value = vr.getData(position[0], position[1]);
+					//cout << Value << " ";
+				}
 				else
 				{
 					for (int p = 0; p < 7; p++)
@@ -95,8 +102,18 @@ namespace msc2d
 							distance[0] = position[0] - x_ordinates[i];
 							distance[1] = position[1] - y_ordinates[j];
 							value0 = bs->compute_value(distance);
-
-							//cout<<p7.evaluate(distance)<<endl;
+							//Value += vr.getData(position[0], position[1])*value0;
+							diff_x = vr.getData(cut(position[0] + 1, vr.dim[0]), position[1])
+									+ vr.getData(cut(position[0] - 1, vr.dim[0]), position[1])
+									- 2 * vr.getData(position[0], position[1]);
+								
+							diff_y = vr.getData(position[0], cut(position[1] + 1, vr.dim[1]))
+									+ vr.getData(position[0], cut(position[1] - 1, vr.dim[1]))
+									- 2 * vr.getData(position[0], position[1]);
+							
+							f_with_diff = vr.getData(position[0],position[1]) - 1.0*(diff_x + diff_y) / 8;							
+							Value += f_with_diff*value0;
+							
 							//diff_x = vr.getData(cut(position[0]+1,vr.dim[0]),position[1])+vr.getData(cut(position[0]-1,vr.dim[0]),position[1])-2*vr.getData(position[0],position[1]);
 							//diff_y = vr.getData(position[0],cut(position[1]+1,vr.dim[1]))+vr.getData(position[0],cut(position[1]-1,vr.dim[1]))-2*vr.getData(position[0],position[1]);
 							//f_with_diff = vr.getData(position[0],position[1])-5.0*(diff_x+diff_y)/24;
@@ -104,7 +121,7 @@ namespace msc2d
 							//diff_y = vr.getData(position[0],cut(position[1]+1,vr.dim[1]))+vr.getData(position[0],cut(position[1]-1,vr.dim[1]))-2*vr.getData(position[0],position[1]);
 							//f_with_diff = vr.getData(position[0],position[1])-1.0*(diff_x+diff_y)/8;
 
-							Value += vr.getData(position[0], position[1])*value0;
+							
 						}
 					}
 				}
@@ -121,13 +138,15 @@ namespace msc2d
 
 						value1 = bs->compute_gradient_x(distance);
 						value2 = bs->compute_gradient_y(distance);
-						diff_x = vr.getData(cut(position[0] + 1, vr.dim[0]), position[1]) + vr.getData(cut(position[0] - 1, vr.dim[0]), position[1]) - 2 * vr.getData(position[0], position[1]);
+						dif__x += vr.getData(position[0], position[1])*value1;
+						dif__y += vr.getData(position[0], position[1])*value2;
+
+						/*diff_x = vr.getData(cut(position[0] + 1, vr.dim[0]), position[1]) + vr.getData(cut(position[0] - 1, vr.dim[0]), position[1]) - 2 * vr.getData(position[0], position[1]);
 						diff_y = vr.getData(position[0], cut(position[1] + 1, vr.dim[1])) + vr.getData(position[0], cut(position[1] - 1, vr.dim[1])) - 2 * vr.getData(position[0], position[1]);
 						f_with_diff = vr.getData(position[0], position[1]) - 1.0*(diff_x + diff_y) / 8;
 						dif__x += f_with_diff*value1;
-						dif__y += f_with_diff*value2;
-						//dif__xx += vr.getData(position[0],position[1])*value3;
-						//dif__yy += vr.getData(position[0],position[1])*value4;
+						dif__y += f_with_diff*value2;*/
+						
 					}
 				}
 				//导数最值
@@ -212,16 +231,15 @@ namespace msc2d
 				}*/
 				//201数据
 
-				if (dif__x<0.006&&dif__x>-0.006)
-					dif__x = 0;
-				if (dif__y<0.006&&dif__y>-0.006)
-					dif__y = 0;
-
-				if (dif__xx<2e-006&&dif__xx>-2e-006)
+				if (dif__x< LARGE_ZERO_EPSILON &&dif__x>-LARGE_ZERO_EPSILON)
+						dif__x = 0;
+				if (dif__y<LARGE_ZERO_EPSILON&&dif__y>-LARGE_ZERO_EPSILON)
+						dif__y = 0;
+				if (dif__xx<SMALL_ZERO_EPSILON&&dif__xx>-SMALL_ZERO_EPSILON)
 					dif__xx = 0;
-				if (dif__yy<2e-006&&dif__yy>-2e-006)
+				if (dif__yy<SMALL_ZERO_EPSILON&&dif__yy>-SMALL_ZERO_EPSILON)
 					dif__yy = 0;
-				if (dif__xy<2e-006&&dif__xy>-2e-006)
+				if (dif__xy<SMALL_ZERO_EPSILON&&dif__xy>-SMALL_ZERO_EPSILON)
 					dif__xy = 0;
 
 			        CriticalPoint cp;
@@ -229,9 +247,11 @@ namespace msc2d
 					cp.xy_local.second = j;
 					cp.meshIndex = i*vr.dim[0] + j;
 					cp.dif = make_pair(dif__x, dif__y);
-				
+					
+					
 				if (dif__x == 0 && dif__y == 0)
 				{
+					count_cp++; 
 					double eig_value[2], eig_vector[2][2], dif[2][2], eps = 0.000001;
 					const int Dim = 2, nJt = 1000000;
 					
@@ -258,7 +278,9 @@ namespace msc2d
 							cp.eig_vector1 = make_pair(eig_vector[0][0], eig_vector[1][0]);
 							cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
 						}
+						value <<i << " "<<j<<" "<<cp.type<<endl;
 					}	
+
 				}
 				else 
 					cp.type = REGULAR;
@@ -268,72 +290,26 @@ namespace msc2d
 				
 				
 				
-				//cout << cp_vec[i].xy_local.first << " " << cp_vec[i].xy_local.second << " " << cp_vec[i].type << endl;
-				/*value << Value << " ";
+				/*//cout << cp_vec[i].xy_local.first << " " << cp_vec[i].xy_local.second << " " << cp_vec[i].type << endl;
+				//value <<  << " ";
 				dif_x << dif__x << " ";
 				dif_y << dif__y << " ";
 				dif_xx << dif__xx << " ";
 				dif_xy << dif__xy << " ";
 				dif_yy << dif__yy << " ";*/
 			}
-			/*value << endl;
-			dif_x << endl;
+			//value << endl;
+			/*dif_x << endl;
 			dif_y << endl;
 			dif_xx << endl;
 			dif_xy << endl;
 			dif_yy << endl;*/
 		}
 		delete bs;
-		cout << " find critical point end!" << endl;
+		cout <<"critical point number:"<< count_cp << endl;
+		cout << "End !" << endl << endl;
 	}
-	//CriticalPointType CPFinder::getPointType(double eig_value1, double eig_value2) const
-	//{
-	//	//if (eig_value1 < 0 && eig_value2 < 0)
-	//	return  MAXIMAL;
-
-	//void CPFinder::findCriticalPoints()
-	//{
-	//	for (int i = 0; i < vr.dim[0]; i++)
-	//	{
-	//		for (int j = 0; j < vr.dim[1]; j++)
-	//		{
-
-	//			double eig_value[2], eig_vector[2][2], dif[2][2], eps = 0.001;
-	//			int Dim = 2, nJt = 10;
-	//			CriticalPoint cp;
-	//			cp.xy_local.first = i;
-	//			cp.xy_local.second = j;
-	//			cp.meshIndex = i*vr.dim[0] + j;
-	//			cp.dif = make_pair(dif__x, dif__y);
-
-	//			if (dif__x == 0 && dif__y == 0)
-	//			{
-	//				dif[0][0] = dif__xx; dif[0][1] = dif__xy; dif[1][0] = dif__xy; dif[1][1] = dif__yy;
-	//				if (JacbiCor(*dif, Dim, *eig_vector, eig_value, eps, nJt))
-	//				{
-	//					if (eig_value[1]<0 && eig_value[0]<0)
-	//					{
-	//						cp.type = MAXIMAL;
-	//					}
-	//					else if (eig_value[0]>0 && eig_value[1]>0)
-	//						cp.type = MINIMAL;
-	//					else
-	//					{
-	//						cp.type = SADDLE;
-	//						//特征向量
-	//						cp.eig_vector1 = make_pair(eig_vector[0][0], eig_vector[1][0]);
-	//						cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
-	//					}
-	//				}
-	//			}
-	//			else
-	//				cp.type = REGULAR;
-	//			cp_vec.push_back(cp);
-	//		}
-	//	}
-	//}
-	//}
-	//求特征向量特征值
+	
 	bool CPFinder::JacbiCor(double * pMatrix, double *pdblVects, double *pdbEigenValues, double dbEps, int nJt)
 	{
 		if (pMatrix[0] == pMatrix[3])

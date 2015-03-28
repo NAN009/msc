@@ -21,7 +21,7 @@ namespace msc2d
 		~ILTracer();
 		bool traceIntegrationLine();
 		bool traceAscendingPath();
-
+		int Round(double r);
 	private:
 		bool createWEdge();
 		

@@ -5,7 +5,7 @@
 //#include "vtkReader.h"
 #include "mscomplex.h"
 #include<memory>
-const int vr1_size = 201;
+const int vr1_size = 401;
 //shared_ptr<vtkReader> vr; 
 //vtkReader vr1;
 
@@ -43,30 +43,54 @@ namespace msc2d
 					PATH& mesh_path = il.path;
 					mesh_path.push_back(make_pair(curr_x,curr_y));
 
-					int k1x = floor(sad.eig_vector1.first);
-					int k2x = floor(msc.cp_vec[(curr_x+k1x)*vr1_size+curr_y+1].dif.first);
-					int k3x = floor(msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first);
-					//int next_x = curr_x + floor((sad.eig_vector1.first + 2 * msc.cp_vec[(curr_x + k1x)*vr1_size + curr_y + 1].dif.first + 2 * msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first + msc.cp_vec[(curr_x + k3x)*vr1_size + curr_y + 2].dif.first) / 3);
-					int k1y = floor(sad.eig_vector1.second);
-					int k2y = floor(msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second);
-					int k3y = floor(msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second);
+					int k1x = Round(sad.eig_vector1.first);
+					int k2x = Round(msc.cp_vec[(curr_x+k1x)*vr1_size+curr_y+1].dif.first);
+					int k3x = Round(msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first);
+					
+					int k1y = Round(sad.eig_vector1.second);
+					int k2y = Round(msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second);
+					int k3y = Round(msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second);
 
-					int next_x = curr_x + floor((sad.eig_vector1.first + 2 * (msc.cp_vec[(curr_x + k1x)*vr1_size + curr_y + 1].dif.first) + 2 * (msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first) + msc.cp_vec[(curr_x + k3x)*vr1_size + curr_y + 2].dif.first) / 3);
-					int next_y = curr_y + floor((sad.eig_vector1.second + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second) + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second) + msc.cp_vec[curr_x + 2 + (curr_y + k3y)*vr1_size].dif.second) / 3);
+					int next_x = curr_x + Round((sad.eig_vector1.first + 2 * (msc.cp_vec[(curr_x + k1x)*vr1_size + curr_y + 1].dif.first) + 2 * (msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first) + msc.cp_vec[(curr_x + k3x)*vr1_size + curr_y + 2].dif.first) / 3);
+					int next_y = curr_y + Round((sad.eig_vector1.second + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second) + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second) + msc.cp_vec[curr_x + 2 + (curr_y + k3y)*vr1_size].dif.second) / 3);
 
 					curr_vid = next_x*vr1_size + next_y;
 					while (msc.cp_vec[curr_vid].type != MAXIMAL)
 					{
-						/*if (msc.cp_vec[curr_vid].type == SADDLE)
+						while(msc.cp_vec[curr_vid].type == SADDLE)
 						{
-						continue;
-						}*/
+							int k1x = Round(msc.cp_vec[curr_vid].eig_vector1.first);
+							int k2x = Round(msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k1x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first);
+							int k3x = Round(msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k2x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first);
+
+							int k1y = Round(msc.cp_vec[curr_vid].eig_vector1.second);
+							int k2y = Round(msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k1y)*vr1_size].dif.second);
+							int k3y = Round(msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k2y)*vr1_size].dif.second);
+
+							int next_x1 = msc.cp_vec[curr_vid].xy_local.first + Round((msc.cp_vec[curr_vid].eig_vector1.first + 2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k1x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first) + 2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k2x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first) + msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k3x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 2].dif.first) / 3);
+							int next_y1 = msc.cp_vec[curr_vid].xy_local.second + Round((msc.cp_vec[curr_vid].eig_vector1.second + 2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k1y)*vr1_size].dif.second) + 2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k2y)*vr1_size].dif.second) + msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 2 + (msc.cp_vec[curr_vid].xy_local.second + k3y)*vr1_size].dif.second) / 3);
+
+							curr_vid = next_x1*vr1_size + next_y1;
+						}
 						pair<int, int> tmp_xy;
 						tmp_xy = getGradDirection(msc.cp_vec[curr_vid].xy_local);
 						mesh_path.push_back(tmp_xy);                  
+						if (tmp_xy.first>= vr1_size || tmp_xy.second >= vr1_size||tmp_xy.first<0||tmp_xy.second<0)
+							break;
 						
-						prev_vid = curr_vid;
-						curr_vid = tmp_xy.first*vr1_size + tmp_xy.second;
+							prev_vid = curr_vid;
+							curr_vid = tmp_xy.first*vr1_size + tmp_xy.second;
+							if (msc.cp_vec[curr_vid].type == MINIMAL || msc.cp_vec[curr_vid+1].type == MINIMAL ||
+								msc.cp_vec[curr_vid - vr1_size].type == MINIMAL || msc.cp_vec[curr_vid+vr1_size].type == MINIMAL ||
+								msc.cp_vec[curr_vid - vr1_size+1].type == MINIMAL || msc.cp_vec[curr_vid - 1].type == MINIMAL ||
+								msc.cp_vec[curr_vid - vr1_size - 1].type == MINIMAL || msc.cp_vec[curr_vid + vr1_size + 1].type == MINIMAL || msc.cp_vec[curr_vid + vr1_size -1].type == MINIMAL)
+						{
+							
+							cout << "ERROR,This line is ascend！"<<endl;
+							break;
+						}
+						
+
 					}
 					il.startIndex = it->xy_local;
 					il.endIndex = mesh_path[mesh_path.size()-1];
@@ -77,20 +101,26 @@ namespace msc2d
 		
 		return true;
 	}
-	
+	int ILTracer::Round(double r)
+	{
+		if (r > 0)
+			return ceil(r);
+		else
+			return floor(r);
+	}
 	pair<int,int> ILTracer::getGradDirection(pair<int,int> xy)
 	{
-		//四阶龙格库塔法 h=2,待检验，floor向下取整
+		//四阶龙格库塔法 h=2,待检验，Round向下取整
 
 		int x = xy.first, y = xy.second;
-		int k1x = floor(msc.cp_vec[x*vr1_size+y].dif.first);
-		int k2x=floor(msc.cp_vec[(x + k1x)*vr1_size + y + 1].dif.first);
-		int k3x = floor(msc.cp_vec[(x + k2x)*vr1_size + y + 1].dif.first);
-		int next_X = x + floor((msc.cp_vec[x*vr1_size + y].dif.first + 2 * msc.cp_vec[(x + k1x)*vr1_size + y + 1].dif.first + 2 * msc.cp_vec[(x + k2x)*vr1_size + y + 1].dif.first + msc.cp_vec[(x + k3x)*vr1_size + y + 2].dif.first) / 3);
-		int k1y = floor(msc.cp_vec[y*vr1_size + x].dif.second);
-		int k2y = floor(msc.cp_vec[(y + k1y)*vr1_size + x + 1].dif.second);
-		int k3y = floor(msc.cp_vec[(y + k2y)*vr1_size + x + 1].dif.second);
-		int next_Y = y + floor((msc.cp_vec[y*vr1_size + x].dif.second + 2 * msc.cp_vec[(y + k1y)*vr1_size + x + 1].dif.second + 2 * msc.cp_vec[(y + k2y)*vr1_size + x + 1].dif.second + msc.cp_vec[(y + k3y)*vr1_size + x +2].dif.second) / 3);
+		int k1x = Round(msc.cp_vec[x*vr1_size+y].dif.first);
+		int k2x=Round(msc.cp_vec[(x + k1x)*vr1_size + y + 1].dif.first);
+		int k3x = Round(msc.cp_vec[(x + k2x)*vr1_size + y + 1].dif.first);
+		int next_X = x + Round((msc.cp_vec[x*vr1_size + y].dif.first + 2 * msc.cp_vec[(x + k1x)*vr1_size + y + 1].dif.first + 2 * msc.cp_vec[(x + k2x)*vr1_size + y + 1].dif.first + msc.cp_vec[(x + k3x)*vr1_size + y + 2].dif.first) / 3);
+		int k1y = Round(msc.cp_vec[y*vr1_size + x].dif.second);
+		int k2y = Round(msc.cp_vec[(y + k1y)*vr1_size + x + 1].dif.second);
+		int k3y = Round(msc.cp_vec[(y + k2y)*vr1_size + x + 1].dif.second);
+		int next_Y = y + Round((msc.cp_vec[y*vr1_size + x].dif.second + 2 * msc.cp_vec[(y + k1y)*vr1_size + x + 1].dif.second + 2 * msc.cp_vec[(y + k2y)*vr1_size + x + 1].dif.second + msc.cp_vec[(y + k3y)*vr1_size + x +2].dif.second) / 3);
 
 		return make_pair(next_X, next_Y); 
 
