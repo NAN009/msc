@@ -75,7 +75,9 @@ namespace msc2d
 						pair<int, int> tmp_xy;
 						tmp_xy = getGradDirection(msc.cp_vec[curr_vid].xy_local);
 						mesh_path.push_back(tmp_xy);                  
-						if (tmp_xy.first>= vr1_size || tmp_xy.second >= vr1_size||tmp_xy.first<0||tmp_xy.second<0)
+						if (tmp_xy.first >= vr1_size - 2 || tmp_xy.second >= vr1_size - 2 
+							|| tmp_xy.first >= vr1_size - 3 || tmp_xy.second >= vr1_size - 3 ||
+							tmp_xy.first <= 0 || tmp_xy.second <= 0)
 							break;
 						
 							prev_vid = curr_vid;

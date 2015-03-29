@@ -13,7 +13,7 @@
 
 namespace msc2d
 {
-	const double LARGE_ZERO_EPSILON = 0.0035;//401数据
+	const double LARGE_ZERO_EPSILON = 0.0025;//401数据
 	const double SMALL_ZERO_EPSILON = 2e-006;
 	using namespace std;
 	vtkReader vr;
@@ -54,7 +54,7 @@ namespace msc2d
 		
 		vr.loadFile("D:\\401data\\sin401.vtk");//201数据：由于201数据步长为0.1，求偏导数的默认步长为1，故求出结果为实际结果的十分之一；
 		double x_ordinates[10000], y_ordinates[10000];//第一个参数为列，按列读取数据
-		ofstream value("D:\\401data\\sin401_cp.txt");
+		//ofstream value("D:\\401data\\sin401_cp.txt");
 		//ofstream dif_x("D:\\data\\201sin_dif_x.txt");
 		//ofstream dif_y("D:\\data\\201sin_dif_y.txt");
 		//ofstream dif_xx("D:\\data\\201sin_dif_xx.txt");
@@ -278,7 +278,7 @@ namespace msc2d
 							cp.eig_vector1 = make_pair(eig_vector[0][0], eig_vector[1][0]);
 							cp.eig_vector2 = make_pair(eig_vector[0][1], eig_vector[1][1]);
 						}
-						value <<i << " "<<j<<" "<<cp.type<<endl;
+						//value <<i << " "<<j<<" "<<cp.type<<endl;
 					}	
 
 				}
