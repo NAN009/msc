@@ -43,18 +43,6 @@ namespace msc2d
 					PATH& mesh_path = il.path;
 					mesh_path.push_back(make_pair(curr_x,curr_y));
 
-					int k1x = Round(sad.eig_vector1.first);
-					int k2x = Round(msc.cp_vec[(curr_x+k1x)*vr1_size+curr_y+1].dif.first);
-					int k3x = Round(msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first);
-					
-					int k1y = Round(sad.eig_vector1.second);
-					int k2y = Round(msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second);
-					int k3y = Round(msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second);
-
-					int next_x = curr_x + Round((sad.eig_vector1.first + 2 * (msc.cp_vec[(curr_x + k1x)*vr1_size + curr_y + 1].dif.first) + 2 * (msc.cp_vec[(curr_x + k2x)*vr1_size + curr_y + 1].dif.first) + msc.cp_vec[(curr_x + k3x)*vr1_size + curr_y + 2].dif.first) / 3);
-					int next_y = curr_y + Round((sad.eig_vector1.second + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k1y)*vr1_size].dif.second) + 2 * (msc.cp_vec[curr_x + 1 + (curr_y + k2y)*vr1_size].dif.second) + msc.cp_vec[curr_x + 2 + (curr_y + k3y)*vr1_size].dif.second) / 3);
-
-					curr_vid = next_x*vr1_size + next_y;
 					while (msc.cp_vec[curr_vid].type != MAXIMAL)
 					{
 						while(msc.cp_vec[curr_vid].type == SADDLE)
@@ -67,8 +55,16 @@ namespace msc2d
 							int k2y = Round(msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k1y)*vr1_size].dif.second);
 							int k3y = Round(msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k2y)*vr1_size].dif.second);
 
-							int next_x1 = msc.cp_vec[curr_vid].xy_local.first + Round((msc.cp_vec[curr_vid].eig_vector1.first + 2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k1x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first) + 2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k2x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first) + msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k3x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 2].dif.first) / 3);
-							int next_y1 = msc.cp_vec[curr_vid].xy_local.second + Round((msc.cp_vec[curr_vid].eig_vector1.second + 2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k1y)*vr1_size].dif.second) + 2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k2y)*vr1_size].dif.second) + msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 2 + (msc.cp_vec[curr_vid].xy_local.second + k3y)*vr1_size].dif.second) / 3);
+							int next_x1 = msc.cp_vec[curr_vid].xy_local.first + Round(
+								(msc.cp_vec[curr_vid].eig_vector1.first 
+								+2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k1x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first)
+								+ 2 * (msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k2x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 1].dif.first) 
+								+ msc.cp_vec[(msc.cp_vec[curr_vid].xy_local.first + k3x)*vr1_size + msc.cp_vec[curr_vid].xy_local.second + 2].dif.first) / 3);
+							int next_y1 = msc.cp_vec[curr_vid].xy_local.second + Round(
+								(msc.cp_vec[curr_vid].eig_vector1.second + 
+								2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k1y)*vr1_size].dif.second) + 
+								2 * (msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 1 + (msc.cp_vec[curr_vid].xy_local.second + k2y)*vr1_size].dif.second) + 
+								msc.cp_vec[msc.cp_vec[curr_vid].xy_local.first + 2 + (msc.cp_vec[curr_vid].xy_local.second + k3y)*vr1_size].dif.second) / 3);
 
 							curr_vid = next_x1*vr1_size + next_y1;
 						}
